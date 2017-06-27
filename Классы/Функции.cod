@@ -1,0 +1,34 @@
+﻿class "Функции";
+
+inclass
+
+  func ЗаписьПоКоду (Name:class record; filter:string):record;
+      result = FindRecord(Name,"Код='"+filter+"'");
+      if result=nil then
+         result=Name.Create;
+         result.код=filter;
+         result.Имя=filter;
+         result.post;
+      end;
+  end;
+
+  func FindRecord synonym FR(Name:class record; filter:string; OrderFields:string=""; AllowRightChecking:logical=true):record;
+  var q:query;
+    q=query.create([Name]);
+    q.loadingFieldsMode=сис2.константы.mdNone;
+    q.openHint[q.LargeResult]=true;
+    q.openHint[q.Packeting]=true;
+    q.OpenHint[q.IgnoreRecordFilter]=not AllowRightChecking;
+    q.PacketSize=1;
+    q.filter=filter;
+    q.order=orderFields;
+    q.select;
+    if not q.EOF then
+      result=q.current;
+    end;
+  end;
+
+
+inobject
+
+end

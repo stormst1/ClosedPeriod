@@ -1,0 +1,55 @@
+﻿Class "Profile";
+
+inclass
+
+  proc Init;
+    var ДатаЗакрытия:Дата;
+    var локОблУчета :AccDomain;
+    var vRecClasses :Class[] Record;
+    var vRecClass :class Record;
+    var i,j:integer;
+    var УсловияПроводок                      :String;
+
+
+      if Функции.ЗаписьПоКоду(МашинаРеквизитов.Настройки.Реквизит,"ЗакрытыйПериод.ДатаЗакрытия").Комментарий<>"" then
+          try
+           ДатаЗакрытия       =StringToDate(Функции.ЗаписьПоКоду(МашинаРеквизитов.Настройки.Реквизит,"ЗакрытыйПериод.ДатаЗакрытия").Комментарий);
+          исключение
+          конец;
+      end;
+      if ДатаЗакрытия<>nil then
+          for I = 1..AccStruct.AccDomainCount do
+            локОблУчета = AccStruct.AccDomain[I];
+            if локОблУчета.Name = "Бухгалтерия" then
+              Break;
+            end;
+          end;
+          for j = 1..локОблУчета.JourCount do
+            if  не(локОблУчета.Journal[j].name ="УчетУплаченныхНалогов" или
+              локОблУчета.Journal[j].name ="УчетУплаченныхНалогов" )  then
+
+              vRecClasses=локОблУчета.Journal[j].records;
+              for I = 1..LengthOfArray(vRecClasses) do
+                vRecClass = vRecClasses[I];
+                условияпроводок=nil;
+                try
+                  vRecClass.AddUserConstraint("","("+условияпроводок+"  ("+if(локОблУчета.Journal[j].EnableField="","","не "+локОблУчета.Journal[j].EnableField+" или ")+локОблУчета.Journal[j].DateField+"<01.01.1900 или "+локОблУчета.Journal[j].DateField+">="+str(ДатаЗакрытия)+")"+")",
+                  "Правка закрытого периода "+str(локОблУчета.Journal[j].name), True, True, True, True);
+                исключение
+                --                        trace(str(vRecClass));
+                конец;
+              end;
+            end;
+          end;
+        
+      end;
+
+
+  end;
+
+
+
+
+inobject
+
+end

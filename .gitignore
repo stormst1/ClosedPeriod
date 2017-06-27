@@ -1,0 +1,8 @@
+*.deb
+*.dsk
+*.sig
+*.#mtl
+*.#hlp
+*.#cod
+*.#acc
+*.#prj
